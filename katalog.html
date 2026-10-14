@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Katalog — Ockta Bakery</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600;9..144,800&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#ffffff;--bg2:#fff8f5;--bg3:#fdf0ec;
+  --fg:#2a1a17;--muted:#7c5c56;--line:#e8d5cf;--card:#ffffff;
+  --accent:#c2476b;--accent2:#e8b4c2;--accent-dark:#8f2d4a;
+  --serif:"Fraunces",Georgia,serif;--sans:"DM Sans",system-ui,sans-serif;
+  --nav-h:68px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;scroll-padding-top:var(--nav-h);}
+body{font-family:var(--sans);background:var(--bg);color:var(--fg);overflow-x:hidden;}
+img{max-width:100%;display:block;}
+a{color:inherit;text-decoration:none;}
+:focus-visible{outline:3px solid var(--accent);outline-offset:3px;}
+.wrap{width:min(1120px,100% - 3rem);margin-inline:auto;}
+
+/* NAVBAR */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:900;height:var(--nav-h);display:flex;align-items:center;justify-content:space-between;padding:0 3rem;background:rgba(255,255,255,.96);backdrop-filter:blur(14px);box-shadow:0 1px 0 var(--line);}
+.nav-logo{font-family:var(--serif);font-size:1.35rem;font-weight:800;color:var(--fg);letter-spacing:-.01em;}
+.nav-links{display:flex;gap:2.2rem;align-items:center;}
+.nav-links a{font-size:.85rem;font-weight:500;letter-spacing:.03em;color:var(--muted);position:relative;padding-bottom:3px;transition:color .25s;}
+.nav-links a::after{content:'';position:absolute;bottom:0;left:0;width:0;height:1.5px;background:var(--accent);transition:width .25s;}
+.nav-links a:hover,.nav-links a.active{color:var(--accent);}
+.nav-links a:hover::after,.nav-links a.active::after{width:100%;}
+.cart-nav-btn{position:relative;background:none;border:none;cursor:pointer;color:var(--fg);font-size:1.3rem;padding:4px;transition:color .25s;}
+.cart-nav-btn:hover{color:var(--accent);}
+.cart-nav-count{position:absolute;top:-2px;right:-5px;background:var(--accent);color:#fff;font-size:.65rem;font-weight:700;width:16px;height:16px;border-radius:50%;display:flex;align-items:center;justify-content:center;opacity:0;transform:scale(0);transition:opacity .2s,transform .2s;}
+.cart-nav-count.show{opacity:1;transform:scale(1);}
+.nav-toggle{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px;}
+.nav-toggle span{display:block;width:22px;height:2px;background:var(--fg);border-radius:2px;transition:transform .3s,opacity .3s;}
+.nav-toggle.open span:nth-child(1){transform:translateY(7px) rotate(45deg);}
+.nav-toggle.open span:nth-child(2){opacity:0;}
+.nav-toggle.open span:nth-child(3){transform:translateY(-7px) rotate(-45deg);}
+
+/* PAGE HERO */
+.page-hero{padding-top:calc(var(--nav-h) + 3rem);padding-bottom:3rem;background:var(--bg2);border-bottom:1px solid var(--line);}
+.page-hero h1{font-family:var(--serif);font-size:clamp(2.2rem,6vw,4rem);font-weight:800;line-height:1;margin-bottom:.5rem;}
+.page-hero p{color:var(--muted);font-size:1rem;}
+
+/* LAYOUT */
+.katalog-layout{display:grid;grid-template-columns:220px 1fr;gap:2.5rem;padding:3rem 0 5rem;align-items:start;}
+.sidebar{position:sticky;top:calc(var(--nav-h)+1.5rem);}
+.sidebar-title{font-family:var(--serif);font-size:1rem;font-weight:800;margin-bottom:1rem;color:var(--fg);}
+.filter-group{margin-bottom:1.8rem;}
+.filter-group-label{font-size:.72rem;font-weight:700;letter-spacing:.1em;color:var(--muted);margin-bottom:.6rem;text-transform:uppercase;}
+.filter-list{display:flex;flex-direction:column;gap:.3rem;}
+.filter-btn{background:none;border:none;text-align:left;cursor:pointer;font-family:var(--sans);font-size:.88rem;font-weight:500;color:var(--muted);padding:.45rem .75rem;border-radius:10px;transition:background .2s,color .2s;}
+.filter-btn:hover{background:var(--bg3);color:var(--fg);}
+.filter-btn.active{background:var(--accent);color:#fff;font-weight:700;}
+.filter-count{float:right;font-size:.75rem;background:rgba(0,0,0,.08);border-radius:999px;padding:.1rem .45rem;margin-top:.05rem;}
+.filter-btn.active .filter-count{background:rgba(255,255,255,.25);}
+
+/* PRODUK */
+.products-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4rem;gap:1rem;flex-wrap:wrap;}
+.products-count{font-size:.88rem;color:var(--muted);}
+.search-box{display:flex;align-items:center;gap:.5rem;background:var(--bg2);border:1.5px solid var(--line);border-radius:999px;padding:.4rem 1rem;flex:1;max-width:260px;}
+.search-box input{background:none;border:none;outline:none;font-family:var(--sans);font-size:.88rem;color:var(--fg);width:100%;}
+.search-box input::placeholder{color:var(--muted);}
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.2rem;}
+
+/* KARTU */
+.product-card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .25s,transform .25s;}
+.product-card:hover{box-shadow:0 8px 28px rgba(194,71,107,.12);transform:translateY(-2px);}
+.product-thumb{aspect-ratio:4/3;position:relative;overflow:hidden;flex-shrink:0;cursor:pointer;}
+.p-bg{position:absolute;inset:0;background-size:cover;background-position:center;transition:transform .4s;}
+.product-thumb:hover .p-bg{transform:scale(1.05);}
+.product-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.thumb-hover{position:absolute;inset:0;background:rgba(30,10,8,.72);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.2rem;opacity:0;transition:opacity .3s;pointer-events:none;}
+.product-thumb:hover .thumb-hover{opacity:1;}
+.thumb-hover p{color:#fff;font-size:.82rem;line-height:1.6;text-align:center;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;line-clamp:4;overflow:hidden;}
+.thumb-hover .th-tag{font-size:.7rem;font-weight:700;letter-spacing:.08em;color:var(--accent2);margin-bottom:.5rem;}
+.product-body{padding:.9rem 1rem 1rem;display:flex;flex-direction:column;gap:.3rem;flex:1;}
+.product-cat{font-size:.7rem;font-weight:700;letter-spacing:.08em;color:var(--accent);}
+.product-name{font-family:var(--serif);font-size:1.05rem;font-weight:800;line-height:1.25;cursor:pointer;}
+.product-name:hover{color:var(--accent);}
+.price-single{font-weight:700;font-size:.95rem;color:var(--accent);margin:.2rem 0;}
+.price-multi{margin:.3rem 0;}
+.price-multi-label{font-size:.72rem;font-weight:600;color:var(--muted);margin-bottom:.3rem;}
+.size-pills{display:flex;flex-wrap:wrap;gap:.35rem;}
+.size-pill{font-size:.75rem;font-weight:600;border:1.5px solid var(--line);border-radius:999px;padding:.25rem .65rem;cursor:pointer;transition:background .15s,border-color .15s,color .15s;color:var(--fg);background:transparent;white-space:nowrap;}
+.size-pill:hover{border-color:var(--accent);color:var(--accent);}
+.size-pill.selected{background:var(--accent);color:#fff;border-color:var(--accent);}
+.product-footer{display:flex;align-items:center;justify-content:flex-end;margin-top:auto;padding-top:.6rem;gap:.5rem;}
+.selected-price{font-weight:700;font-size:.9rem;color:var(--accent);margin-right:auto;}
+.cart-btn-card{width:36px;height:36px;border-radius:50%;background:var(--accent);color:#fff;border:none;font-size:1.15rem;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .2s,transform .15s;flex-shrink:0;}
+.cart-btn-card:hover{background:var(--accent-dark);transform:scale(1.08);}
+
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;z-index:1000;background:rgba(30,10,8,.55);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity .25s;backdrop-filter:blur(6px);}
+.modal-backdrop.open{opacity:1;pointer-events:auto;}
+.modal-box{background:var(--card);border-radius:24px;overflow:hidden;width:min(640px,100%);max-height:90vh;overflow-y:auto;transform:scale(.94) translateY(12px);transition:transform .3s;box-shadow:0 24px 80px rgba(30,10,8,.3);}
+.modal-backdrop.open .modal-box{transform:none;}
+.modal-img{aspect-ratio:16/9;position:relative;overflow:hidden;}
+.modal-img .p-bg{position:absolute;inset:0;background-size:cover;background-position:center;}
+.modal-img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.modal-close{position:absolute;top:1rem;right:1rem;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.85);border:none;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5;transition:background .2s;}
+.modal-close:hover{background:#fff;}
+.modal-body{padding:1.6rem 1.8rem 2rem;}
+.modal-cat{font-size:.72rem;font-weight:700;letter-spacing:.1em;color:var(--accent);margin-bottom:.3rem;}
+.modal-name{font-family:var(--serif);font-size:1.6rem;font-weight:800;line-height:1.2;margin-bottom:.7rem;}
+.modal-desc{color:var(--muted);font-size:.92rem;line-height:1.75;margin-bottom:1.2rem;}
+.modal-size-label{font-size:.8rem;font-weight:700;color:var(--fg);margin-bottom:.5rem;}
+.modal-sizes{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.2rem;}
+.modal-size-btn{font-size:.83rem;font-weight:600;border:1.5px solid var(--line);border-radius:10px;padding:.45rem .9rem;cursor:pointer;transition:background .15s,border-color .15s,color .15s;color:var(--fg);background:transparent;display:flex;flex-direction:column;align-items:center;gap:.1rem;}
+.modal-size-btn:hover{border-color:var(--accent);}
+.modal-size-btn.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.modal-size-btn .size-price{font-size:.75rem;font-weight:700;}
+.modal-size-btn.active .size-price{color:rgba(255,255,255,.8);}
+.modal-price-display{font-size:1.4rem;font-weight:800;color:var(--accent);margin-bottom:1rem;}
+.qty-row{display:flex;align-items:center;gap:.8rem;margin-bottom:1.2rem;}
+.qty-btn{width:34px;height:34px;border-radius:50%;border:1.5px solid var(--line);background:transparent;font-size:1.1rem;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.qty-btn:hover{background:var(--bg2);}
+.qty-val{font-weight:700;font-size:1.1rem;min-width:28px;text-align:center;}
+.modal-total-label{font-size:.85rem;color:var(--muted);}
+.modal-total-val{font-weight:700;color:var(--fg);}
+.btn-add-modal{width:100%;padding:.85rem;border-radius:14px;background:var(--accent);color:#fff;border:none;font-family:var(--sans);font-size:.95rem;font-weight:700;cursor:pointer;transition:background .2s,transform .15s;}
+.btn-add-modal:hover{background:var(--accent-dark);transform:translateY(-1px);}
+
+/* KERANJANG PANEL */
+.cart-panel{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%) translateY(120px);z-index:800;background:var(--fg);color:#fff;border-radius:20px;padding:1rem 1.4rem;display:flex;align-items:center;gap:1rem;box-shadow:0 10px 40px rgba(30,10,8,.4);transition:transform .4s cubic-bezier(.2,.8,.2,1);min-width:340px;max-width:90vw;}
+.cart-panel.show{transform:translateX(-50%) translateY(0);}
+.cart-panel-icon{font-size:1.5rem;}
+.cart-panel-info{flex:1;}
+.cart-panel-info .cp-label{font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:.1rem;}
+.cart-panel-info .cp-summary{font-size:.88rem;font-weight:600;}
+.cart-panel-total{font-family:var(--serif);font-size:1.1rem;font-weight:800;color:var(--accent2);white-space:nowrap;}
+.cp-divider{width:1px;height:28px;background:rgba(255,255,255,.15);}
+.btn-checkout{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:.6rem 1.1rem;font-family:var(--sans);font-size:.82rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:background .2s,transform .15s;}
+.btn-checkout:hover{background:#a3335a;transform:translateY(-1px);}
+.btn-clear{background:none;border:none;color:rgba(255,255,255,.35);font-size:.78rem;cursor:pointer;padding:.3rem;transition:color .2s;white-space:nowrap;}
+.btn-clear:hover{color:rgba(255,255,255,.7);}
+
+/* ===== KERANJANG FULLSCREEN ===== */
+.cart-overlay{
+  position:fixed;inset:0;z-index:950;
+  background:var(--bg);
+  display:flex;flex-direction:column;
+  transform:translateY(100%);
+  transition:transform .38s cubic-bezier(.4,0,.2,1);
+  overflow:hidden;
+}
+.cart-overlay.open{transform:translateY(0);}
+
+/* Top bar */
+.cart-topbar{
+  display:flex;align-items:center;gap:1rem;
+  padding:1rem 1.5rem;
+  border-bottom:1px solid var(--line);
+  background:var(--bg);
+  flex-shrink:0;
+  position:sticky;top:0;z-index:2;
+}
+.cart-back-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:var(--bg2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:1.1rem;color:var(--fg);
+  transition:background .2s;flex-shrink:0;
+}
+.cart-back-btn:hover{background:var(--line);}
+.cart-topbar-title{font-family:var(--serif);font-size:1.15rem;font-weight:800;flex:1;}
+.cart-step-indicator{
+  display:flex;align-items:center;gap:.4rem;
+  font-size:.75rem;font-weight:600;color:var(--muted);
+}
+.step-dot{
+  width:8px;height:8px;border-radius:50%;
+  background:var(--line);transition:background .25s;
+}
+.step-dot.active{background:var(--accent);}
+
+/* Scrollable content */
+.cart-content{flex:1;overflow-y:auto;padding:0;}
+
+/* ── Step 1: Review pesanan ── */
+.cart-section{padding:1.25rem 1.5rem;}
+.cart-section-title{
+  font-size:.72rem;font-weight:700;letter-spacing:.1em;
+  color:var(--muted);text-transform:uppercase;
+  margin-bottom:.85rem;
+}
+
+.cart-item{
+  display:flex;gap:1rem;align-items:flex-start;
+  padding:1rem 0;border-bottom:1px solid var(--line);
+}
+.cart-item:last-child{border-bottom:none;}
+.ci-thumb{
+  width:68px;height:68px;border-radius:12px;overflow:hidden;
+  flex-shrink:0;position:relative;background:var(--bg2);
+}
+.ci-thumb .p-bg{position:absolute;inset:0;background-size:cover;background-position:center;}
+.ci-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.ci-info{flex:1;min-width:0;}
+.ci-name{font-family:var(--serif);font-size:.95rem;font-weight:700;line-height:1.3;}
+.ci-sub{font-size:.75rem;color:var(--muted);margin-top:.15rem;}
+.ci-unit-price{font-size:.78rem;color:var(--muted);margin-top:.1rem;}
+.ci-row-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:.6rem;}
+.ci-qty-row{display:flex;align-items:center;gap:.6rem;}
+.ci-qty-btn{
+  width:28px;height:28px;border-radius:50%;
+  border:1.5px solid var(--line);background:transparent;
+  font-size:.95rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s,border-color .15s;
+}
+.ci-qty-btn:hover{background:var(--bg2);border-color:var(--accent);}
+.ci-qty-val{font-size:.9rem;font-weight:700;min-width:22px;text-align:center;}
+.ci-line-total{font-weight:700;font-size:.92rem;color:var(--accent);}
+.ci-remove{
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  font-size:.85rem;padding:4px;transition:color .2s;flex-shrink:0;
+}
+.ci-remove:hover{color:var(--accent);}
+
+/* Empty state */
+.cart-empty{text-align:center;padding:5rem 2rem;color:var(--muted);}
+.cart-empty .ce-icon{font-size:3.5rem;margin-bottom:.85rem;}
+.cart-empty p{line-height:1.7;}
+
+/* Summary card */
+.cart-summary-card{
+  margin:0 1.5rem 1.5rem;
+  background:var(--bg2);border-radius:16px;
+  padding:1.2rem 1.4rem;
+  border:1px solid var(--line);
+}
+.summary-row{
+  display:flex;justify-content:space-between;
+  font-size:.88rem;color:var(--muted);padding:.3rem 0;
+}
+.summary-row.total{
+  font-size:1.05rem;font-weight:700;color:var(--fg);
+  border-top:1px solid var(--line);margin-top:.4rem;padding-top:.8rem;
+}
+.summary-row.total span:last-child{color:var(--accent);}
+
+/* ── Step 2: Detail pembeli ── */
+.form-card{
+  margin:0 1.5rem 1rem;
+  background:var(--bg2);border-radius:16px;
+  padding:1.2rem 1.4rem;border:1px solid var(--line);
+}
+.form-card-title{
+  font-family:var(--serif);font-size:.95rem;font-weight:800;
+  margin-bottom:1rem;color:var(--fg);
+}
+.form-group{margin-bottom:.8rem;}
+.form-group:last-child{margin-bottom:0;}
+.form-group label{
+  display:block;font-size:.72rem;font-weight:700;
+  color:var(--muted);margin-bottom:.35rem;
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.form-group input,
+.form-group select,
+.form-group textarea{
+  width:100%;padding:.65rem 1rem;
+  border:1.5px solid var(--line);border-radius:10px;
+  font-family:var(--sans);font-size:.9rem;color:var(--fg);
+  background:var(--bg);outline:none;
+  transition:border-color .2s;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus{border-color:var(--accent);}
+.form-group textarea{resize:vertical;min-height:72px;line-height:1.55;}
+.form-group select{cursor:pointer;}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:.7rem;}
+
+/* Bottom action bar */
+.cart-footer{
+  padding:1rem 1.5rem;
+  border-top:1px solid var(--line);
+  background:var(--bg);
+  flex-shrink:0;
+  display:flex;flex-direction:column;gap:.6rem;
+}
+.cart-footer-meta{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:.85rem;
+}
+.cart-footer-meta .label{color:var(--muted);}
+.cart-footer-meta .total{font-family:var(--serif);font-size:1.15rem;font-weight:800;color:var(--accent);}
+.cart-footer-meta .items-count{color:var(--muted);font-size:.8rem;}
+.btn-cart-action{
+  display:flex;align-items:center;justify-content:center;gap:.55rem;
+  width:100%;padding:.9rem;border-radius:14px;
+  font-family:var(--sans);font-size:.95rem;font-weight:700;
+  cursor:pointer;border:none;
+  transition:filter .2s,transform .15s;
+}
+.btn-cart-action:hover{filter:brightness(1.06);transform:translateY(-1px);}
+.btn-cart-action:active{transform:scale(.98);}
+.btn-next{background:var(--accent);color:#fff;}
+.btn-wa{background:#25D366;color:#fff;}
+.btn-back-step{
+  background:none;border:none;cursor:pointer;
+  font-family:var(--sans);font-size:.85rem;font-weight:600;
+  color:var(--muted);text-align:center;padding:.4rem;
+  transition:color .2s;
+}
+.btn-back-step:hover{color:var(--fg);}
+
+/* TOAST */
+.toast{position:fixed;bottom:5rem;left:50%;transform:translateX(-50%) translateY(20px);background:var(--fg);color:#fff;border-radius:12px;padding:.7rem 1.3rem;font-size:.85rem;font-weight:500;box-shadow:0 4px 20px rgba(0,0,0,.2);opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;z-index:1200;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+footer{background:var(--bg2);color:var(--muted);padding:1.5rem 0;text-align:center;font-size:.82rem;border-top:1px solid var(--line);}
+
+@media(max-width:900px){.katalog-layout{grid-template-columns:1fr;}.sidebar{position:static;}.filter-list{flex-direction:row;flex-wrap:wrap;}.filter-btn{white-space:nowrap;}}
+@media(max-width:768px){.navbar{padding:0 1.25rem;}.nav-links{display:none;flex-direction:column;gap:0;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(255,248,245,.97);backdrop-filter:blur(20px);align-items:center;justify-content:center;z-index:850;}.nav-links.open{display:flex;}.nav-links a{color:var(--fg);font-size:1.15rem;padding:1.1rem 0;border-bottom:1px solid var(--line);width:60%;text-align:center;}.nav-links a:last-child{border-bottom:none;}.nav-links a::after{display:none;}.nav-toggle{display:flex;}.cart-panel{min-width:0;width:92vw;}.form-row{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<header class="navbar">
+  <a class="nav-logo" href="index.html">Ockta Bakery</a>
+  <button class="nav-toggle" id="navToggle" aria-label="Menu"><span></span><span></span><span></span></button>
+  <nav class="nav-links" id="navLinks">
+    <a href="index.html">Tentang</a>
+    <a href="katalog.html" class="active">Katalog</a>
+    <a href="index.html#kontak">Hubungi Kami</a>
+  </nav>
+  <button class="cart-nav-btn" id="cartNavBtn" aria-label="Buka keranjang">🛒<span class="cart-nav-count" id="cartNavCount">0</span></button>
+</header>
+
+<div class="page-hero">
+  <div class="wrap">
+    <h1>Katalog Kue</h1>
+    <p>Pilih kue favoritmu, masukkan ke keranjang, dan pesan lewat WhatsApp.</p>
+  </div>
+</div>
+
+<div class="wrap katalog-layout">
+  <aside class="sidebar">
+    <div class="sidebar-title">Filter</div>
+    <div class="filter-group">
+      <div class="filter-group-label">Kategori</div>
+      <div class="filter-list" id="filterList"></div>
+    </div>
+  </aside>
+  <div>
+    <div class="products-header">
+      <span class="products-count" id="productsCount"></span>
+      <div class="search-box"><span>🔍</span><input type="search" id="searchInput" placeholder="Cari kue..." aria-label="Cari produk"></div>
+    </div>
+    <div class="product-grid" id="productGrid"></div>
+  </div>
+</div>
+
+<footer><p>© <span id="yr"></span> Ockta Bakery — Dibuat dengan cinta 🍰</p></footer>
+
+<!-- MODAL -->
+<div class="modal-backdrop" id="modalBackdrop" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <div class="modal-img">
+      <div class="p-bg" id="modalBg"></div>
+      <img id="modalImg" src="" alt="" style="display:none">
+      <button class="modal-close" id="modalClose">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-cat" id="modalCat"></div>
+      <h2 class="modal-name" id="modalName"></h2>
+      <p class="modal-desc" id="modalDesc"></p>
+      <div id="modalSizeSection" style="display:none">
+        <div class="modal-size-label">Pilih ukuran</div>
+        <div class="modal-sizes" id="modalSizes"></div>
+      </div>
+      <div class="modal-price-display" id="modalPrice"></div>
+      <div class="qty-row">
+        <button class="qty-btn" id="qtyMinus">−</button>
+        <span class="qty-val" id="qtyVal">1</span>
+        <button class="qty-btn" id="qtyPlus">+</button>
+        <span class="modal-total-label">Total: <span class="modal-total-val" id="modalTotalVal"></span></span>
+      </div>
+      <button class="btn-add-modal" id="btnAddModal">🛒 Masuk Keranjang</button>
+    </div>
+  </div>
+</div>
+
+<!-- KERANJANG DRAWER -->
+<!-- KERANJANG FULLSCREEN OVERLAY -->
+<div class="cart-overlay" id="cartOverlay" aria-label="Keranjang belanja">
+
+  <!-- TOP BAR -->
+  <div class="cart-topbar">
+    <button class="cart-back-btn" id="cartBackBtn" aria-label="Tutup">←</button>
+    <span class="cart-topbar-title" id="cartTopbarTitle">Keranjang</span>
+    <div class="cart-step-indicator">
+      <div class="step-dot active" id="stepDot1"></div>
+      <div class="step-dot" id="stepDot2"></div>
+    </div>
+  </div>
+
+  <!-- CONTENT (scrollable) -->
+  <div class="cart-content" id="cartContent"></div>
+
+  <!-- BOTTOM ACTION BAR -->
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-footer-meta">
+      <div>
+        <div class="label">Total pesanan</div>
+        <div class="items-count" id="cartItemsCount"></div>
+      </div>
+      <div class="total" id="cartTotalVal"></div>
+    </div>
+    <button class="btn-cart-action btn-next" id="btnNextStep">Lanjut ke Detail Pesanan →</button>
+  </div>
+</div>
+
+<!-- FLOATING PANEL -->
+<div class="cart-panel" id="cartPanel">
+  <div class="cart-panel-icon">🛒</div>
+  <div class="cart-panel-info">
+    <div class="cp-label">Keranjang kamu</div>
+    <div class="cp-summary" id="cpSummary"></div>
+  </div>
+  <div class="cp-divider"></div>
+  <span class="cart-panel-total" id="cpTotal"></span>
+  <div class="cp-divider"></div>
+  <button class="btn-checkout" id="btnOpenDrawer">Lihat Keranjang</button>
+  <button class="btn-clear" id="btnClearCart">Kosongkan</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CFG = { wa: "6282143957547" };
+
+const PRODUCTS = [
+  /* KUE BASAH */
+  {id:1,  name:"Kue Nona Manis",      cat:"Kue Basah",    desc:"Kue tradisional klasik dengan aroma pandan asli yang harum. Lembut, manis, dan cocok untuk camilan atau suguhan tamu.",         c:["#a8d8a8","#3a7a3a"], img:"img/kuebasah_nonamanis.jpeg", price:5000},
+  {id:2,  name:"Kue Getuk",           cat:"Kue Basah",    desc:"Getuk singkong kukus dengan taburan kelapa parut segar. Manis alami dan mengenyangkan, camilan tradisional yang tidak lekang waktu.", c:["#c8a8e8","#6a3a8a"], img:"img/kuebasah_getuk.jpeg",     price:3000},
+  {id:3,  name:"Onde Onde",           cat:"Kue Basah",    desc:"Bola-bola kenyal berbalut wijen dengan isian kacang hijau manis. Renyah di luar, lembut dan manis di dalam.",                    c:["#f5c842","#a07010"], img:"img/kuebasah_onde.jpeg",       price:5000},
+  {id:4,  name:"Kue Tok",             cat:"Kue Basah",    desc:"Kue tradisional bertekstur kenyal dengan rasa manis yang khas. Cocok untuk camilan keluarga sehari-hari.",                        c:["#e8a870","#8a4820"], img:"img/kuebasah_kuetok.jpeg",     price:5000},
+  {id:5,  name:"Kue Cucur",           cat:"Kue Basah",    desc:"Kue cucur gula merah yang manis harum dengan pinggiran renyah dan bagian tengah yang lembut mengembang.",                         c:["#b87040","#6a3010"], img:"img/kuebasah_cucur.jpeg",      price:3000},
+  {id:6,  name:"Kue Lapis",           cat:"Kue Basah",    desc:"Kue lapis pelangi bertekstur kenyal dengan lapisan warna-warni yang cantik. Manis legit dan cocok untuk semua usia.",             c:["#e87090","#8a2040"], img:"img/kuebasah_lapis.jpeg",      price:2500},
+  /* CAKES & BOLU */
+  {id:7,  name:"Bolu Pisang",         cat:"Cakes & Bolu", desc:"Bolu pisang lembut dengan aroma pisang alami yang harum. Cocok untuk camilan keluarga atau hantaran.",                            c:["#f5c842","#c47d0e"], img:"img/kue_bolupisang.jpeg",
+    sizes:[{label:"Loyang 22 cm",price:75000},{label:"Loyang 24 cm",price:100000},{label:"Loyang 26 cm",price:120000}]},
+  {id:8,  name:"Bolu Gulung",         cat:"Cakes & Bolu", desc:"Bolu gulung lembut dengan krim vanilla yang harum. Teksturnya ringan dan mengembang sempurna, cocok untuk semua kesempatan.",     c:["#f0d8a0","#b08030"], img:"img/kue_bolugulung.jpeg",      price:45000},
+  {id:9,  name:"Cake Strawberry",     cat:"Cakes & Bolu", desc:"Cake berlapis krim lembut dengan topping strawberry segar. Manis, cantik, dan sempurna untuk ulang tahun.",                       c:["#e8637a","#8e2346"], img:"img/kue_strawberry.jpeg",
+    sizes:[{label:"12 cm",price:100000},{label:"14 cm",price:140000},{label:"16 cm",price:200000}]},
+  {id:10, name:"Cake Blackforest",    cat:"Cakes & Bolu", desc:"Cake cokelat klasik dengan krim whip lembut, ceri, dan taburan cokelat serut. Pilihan favorit segala usia.",                      c:["#6b3a4a","#2a1020"], img:"img/kue_blackforest.jpeg",
+    sizes:[{label:"12 cm",price:90000},{label:"14 cm",price:120000},{label:"16 cm",price:140000}]},
+  {id:11, name:"Cake Mango & Muscat", cat:"Cakes & Bolu", desc:"Kue lembut dengan perpaduan potongan mangga segar dan anggur muscat yang manis rasanya. Cocok untuk perayaan spesial.",           c:["#f5a623","#d4841a"], img:"img/kue_mango.jpeg",
+    sizes:[{label:"12 cm",price:150000},{label:"14 cm",price:200000},{label:"16 cm",price:240000}]},
+  {id:12, name:"Lapis Surabaya",      cat:"Cakes & Bolu", desc:"Kue lapis surabaya berlapis cokelat dan vanilla yang lembut dengan rasa mentega yang kaya. Klasik dan selalu disukai.",           c:["#e8b84a","#8a5010"], img:"img/kue_lapissby.jpeg",        price:80000},
+  /* PASTRY */
+  {id:13, name:"Croissant",           cat:"Pastry",       desc:"Croissant berlapis mentega dengan tekstur luar yang renyah dan dalam yang lembut. Dipanggang setiap pagi.",                       c:["#e8c98a","#a07030"], img:"img/pastry_croi.jpeg",         price:20000},
+  {id:14, name:"Cinnamon Roll",       cat:"Pastry",       desc:"Roti gulung kayu manis lembut dengan glaze krim yang manis. Aroma kayunya bikin rumah terasa hangat dan nyaman.",                 c:["#c8905a","#6a3820"], img:"img/pastry_cinarol.jpeg",      price:25000},
+  {id:15, name:"Fudgy Brownies",      cat:"Pastry",       desc:"Dibuat dari cokelat pilihan dengan rasa manis yang pas dan tekstur fudgy yang mantap. Favorit semua kalangan.",                   c:["#5a3020","#2a1208"], img:"img/pastry_fudgy.jpeg",        price:18000},
+  {id:16, name:"Croffle",             cat:"Pastry",       desc:"Perpaduan unik croissant dan waffle — renyah berlapis di luar, lembut di dalam. Cocok disantap hangat dengan topping favoritmu.", c:["#d4a060","#8a5818"], img:"img/pastry_croffle.jpeg",      price:20000},
+  {id:17, name:"Salt Bread",          cat:"Pastry",       desc:"Roti gulung gurih dengan mentega asin yang meleleh di dalam. Teksturnya lembut dan ringan, sempurna untuk sarapan.",              c:["#f0e0b0","#a08040"], img:"img/pastry_saltbread.jpeg",     price:23000},
+  /* KUE KERING */
+  {id:18, name:"Nastar",              cat:"Kue Kering",   desc:"Selai nanas buatan sendiri dalam kue lumer yang langsung meleleh di mulut. Isi per toples.",                                      c:["#f0b94f","#c27a1e"], img:"img/kuker_nastar.jpeg",        price:160000},
+  {id:19, name:"Kastengel",           cat:"Kue Kering",   desc:"Kue keju gurih yang renyah dan harum. Dibuat dari keju pilihan berkualitas, selalu jadi favorit di setiap momen.",                c:["#e8d070","#a09020"], img:"img/kuker_kasteng.jpeg",       price:180000},
+  {id:20, name:"Tumbrint Strawberry", cat:"Kue Kering",   desc:"Kue kering renyah dengan topping strawberry yang manis asam. Tampilannya cantik dan rasanya bikin ketagihan.",                   c:["#e8607a","#8a2038"], img:"img/kuker_tambrin.jpeg",       price:150000},
+  {id:21, name:"Kuping Gajah",        cat:"Kue Kering",   desc:"Kue kering tradisional bertekstur renyah dengan paduan rasa manis gurih dan aroma cokelat yang khas.",                            c:["#d8a46c","#7b4b2a"], img:"img/kuker_kuping.jpeg",        price:100000},
+  {id:22, name:"Kue Kacang",          cat:"Kue Kering",   desc:"Kue kacang tanah yang renyah dan gurih dengan aroma sangrai yang khas. Lumer di mulut dan tidak terlalu manis.",                  c:["#c8a050","#7a5818"], img:"img/kuker_kacang.jpeg",        price:120000},
+  {id:23, name:"Putri Salju",         cat:"Kue Kering",   desc:"Kue bertabur gula halus yang lumer dan harum. Isian kacang mede pilihan membuatnya semakin istimewa.",                            c:["#e8e0d8","#907860"], img:"img/kuker_salju.jpeg",         price:160000},
+  {id:24, name:"Cookies",             cat:"Kue Kering",   desc:"Cookies renyah dengan berbagai pilihan rasa. Garing di tepi, kenyal di tengah, penuh choco chip berkualitas.",                    c:["#d8a46c","#7b4b2a"], img:"img/pastry_cokies.jpeg",       price:15000},
+];
+
+const rp = n => "Rp" + n.toLocaleString("id-ID");
+const waLink = txt => `https://wa.me/${CFG.wa}?text=${encodeURIComponent(txt)}`;
+const $ = id => document.getElementById(id);
+
+function cakeSVG(){
+  return `<svg viewBox="0 0 120 100" aria-hidden="true" style="width:46%;opacity:.8">
+    <ellipse cx="60" cy="88" rx="52" ry="8" fill="rgba(255,255,255,.3)"/>
+    <rect x="22" y="56" width="76" height="30" rx="6" fill="rgba(255,255,255,.85)"/>
+    <rect x="32" y="34" width="56" height="26" rx="6" fill="rgba(255,255,255,.7)"/>
+    <path d="M22 62q8 8 16 0t16 0 16 0 16 0 12 0" fill="none" stroke="rgba(0,0,0,.1)" stroke-width="3"/>
+    <circle cx="60" cy="26" r="7" fill="#e0345a"/>
+    <path d="M60 19q2-8 8-9" fill="none" stroke="#4d7a3a" stroke-width="3" stroke-linecap="round"/>
+  </svg>`;
+}
+
+function getBasePrice(p){ return p.price || (p.sizes?.[0]?.price ?? 0); }
+
+function thumbBgHTML(p){
+  const bg = `linear-gradient(135deg,${p.c[0]},${p.c[1]})`;
+  const inner = p.img
+    ? `<img src="${p.img}" alt="${p.name}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover" loading="lazy">`
+    : `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">${cakeSVG()}</div>`;
+  return `<div class="p-bg" style="background:${bg}">${inner}</div>`;
+}
+
+/* NAVBAR */
+const navToggle=$("navToggle"), navLinks=$("navLinks");
+navToggle.addEventListener("click",()=>{ navToggle.classList.toggle("open"); navLinks.classList.toggle("open"); });
+navLinks.querySelectorAll("a").forEach(a=>a.addEventListener("click",()=>{ navToggle.classList.remove("open"); navLinks.classList.remove("open"); }));
+
+/* FILTER */
+const cats = ["Semua", ...new Set(PRODUCTS.map(p=>p.cat))];
+let activeFilter="Semua", searchQ="";
+const filterList=$("filterList");
+filterList.innerHTML = cats.map(c=>{
+  const count = c==="Semua"?PRODUCTS.length:PRODUCTS.filter(p=>p.cat===c).length;
+  return `<button class="filter-btn${c==="Semua"?" active":""}" data-cat="${c}">${c}<span class="filter-count">${count}</span></button>`;
+}).join("");
+filterList.addEventListener("click",e=>{
+  const btn=e.target.closest(".filter-btn"); if(!btn) return;
+  activeFilter=btn.dataset.cat;
+  filterList.querySelectorAll(".filter-btn").forEach(b=>b.classList.toggle("active",b===btn));
+  renderGrid();
+});
+$("searchInput").addEventListener("input",e=>{ searchQ=e.target.value.toLowerCase(); renderGrid(); });
+
+/* RENDER */
+function getFiltered(){
+  return PRODUCTS.filter(p=>{
+    const catOk = activeFilter==="Semua"||p.cat===activeFilter;
+    const searchOk = !searchQ||p.name.toLowerCase().includes(searchQ)||p.cat.toLowerCase().includes(searchQ);
+    return catOk&&searchOk;
+  });
+}
+
+function renderGrid(){
+  const list=getFiltered();
+  $("productsCount").textContent=`${list.length} produk`;
+  if(!list.length){
+    $("productGrid").innerHTML=`<div style="grid-column:1/-1;text-align:center;padding:4rem 1rem;color:var(--muted)"><div style="font-size:2rem;margin-bottom:.75rem">🔍</div><p>Kue tidak ditemukan.</p></div>`;
+    return;
+  }
+  $("productGrid").innerHTML=list.map(p=>{
+    const hasSize=p.sizes&&p.sizes.length;
+    const basePrice=getBasePrice(p);
+    const priceHTML=hasSize
+      ?`<div class="price-multi"><div class="price-multi-label">Pilih ukuran:</div><div class="size-pills">${p.sizes.map((s,i)=>`<button class="size-pill${i===0?" selected":""}" data-pid="${p.id}" data-si="${i}">${s.label}</button>`).join("")}</div></div>`
+      :`<div class="price-single">${rp(basePrice)}</div>`;
+    return `<article class="product-card" data-id="${p.id}">
+      <div class="product-thumb" data-id="${p.id}">
+        ${thumbBgHTML(p)}
+        <div class="thumb-hover"><div class="th-tag">${p.cat}</div><p>${p.desc}</p></div>
+      </div>
+      <div class="product-body">
+        <span class="product-cat">${p.cat}</span>
+        <h3 class="product-name" data-id="${p.id}">${p.name}</h3>
+        ${priceHTML}
+        <div class="product-footer">
+          ${hasSize?`<span class="selected-price" id="sp-${p.id}">${rp(basePrice)}</span>`:""}
+          <button class="cart-btn-card" data-id="${p.id}" aria-label="Tambah ke keranjang">🛒</button>
+        </div>
+      </div>
+    </article>`;
+  }).join("");
+
+  $("productGrid").querySelectorAll(".size-pill").forEach(pill=>{
+    pill.addEventListener("click",e=>{
+      e.stopPropagation();
+      const pid=+pill.dataset.pid, si=+pill.dataset.si;
+      const p=PRODUCTS.find(x=>x.id===pid); if(!p||!p.sizes) return;
+      $("productGrid").querySelectorAll(`.size-pill[data-pid="${pid}"]`).forEach(sp=>sp.classList.toggle("selected",sp===pill));
+      $(`sp-${pid}`).textContent=rp(p.sizes[si].price);
+      p._selectedSi=si;
+    });
+  });
+}
+
+$("productGrid").addEventListener("click",e=>{
+  if(e.target.closest(".size-pill")) return;
+  const cartEl=e.target.closest(".cart-btn-card");
+  if(cartEl){
+    const p=PRODUCTS.find(x=>x.id===+cartEl.dataset.id); if(!p) return;
+    const si=p._selectedSi??0;
+    const label=p.sizes?p.sizes[si].label:null;
+    const price=p.sizes?p.sizes[si].price:p.price;
+    addToCart(p,1,label,price);
+    showToast(`${p.name}${label?" ("+label+")":""} ditambahkan 🎉`);
+    return;
+  }
+  const thumbEl=e.target.closest(".product-thumb"), nameEl=e.target.closest(".product-name");
+  if(thumbEl||nameEl) openModal(+(thumbEl||nameEl).dataset.id);
+});
+
+renderGrid();
+
+/* MODAL */
+let modalProduct=null, modalQty=1, modalSelectedSi=0;
+
+function openModal(id){
+  modalProduct=PRODUCTS.find(x=>x.id===id); if(!modalProduct) return;
+  modalQty=1; modalSelectedSi=0;
+  const p=modalProduct;
+  $("modalCat").textContent=p.cat;
+  $("modalName").textContent=p.name;
+  $("modalDesc").textContent=p.desc;
+  const bg=`linear-gradient(135deg,${p.c[0]},${p.c[1]})`;
+  $("modalBg").style.background=bg;
+  $("modalBg").innerHTML=p.img?"": `<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">${cakeSVG()}</div>`;
+  const img=$("modalImg");
+  if(p.img){img.src=p.img;img.alt=p.name;img.style.display="block";}else{img.style.display="none";}
+  const hasSize=p.sizes&&p.sizes.length;
+  $("modalSizeSection").style.display=hasSize?"block":"none";
+  if(hasSize){
+    $("modalSizes").innerHTML=p.sizes.map((s,i)=>`<button class="modal-size-btn${i===0?" active":""}" data-si="${i}">${s.label}<span class="size-price">${rp(s.price)}</span></button>`).join("");
+    $("modalSizes").querySelectorAll(".modal-size-btn").forEach(btn=>{
+      btn.addEventListener("click",()=>{ modalSelectedSi=+btn.dataset.si; $("modalSizes").querySelectorAll(".modal-size-btn").forEach(b=>b.classList.toggle("active",b===btn)); updateModalPrice(); });
+    });
+  }
+  updateModalPrice(); $("qtyVal").textContent="1";
+  $("modalBackdrop").classList.add("open"); document.body.style.overflow="hidden";
+}
+
+function updateModalPrice(){
+  if(!modalProduct) return;
+  const price=modalProduct.sizes?modalProduct.sizes[modalSelectedSi].price:modalProduct.price;
+  $("modalPrice").textContent=rp(price);
+  $("modalTotalVal").textContent=rp(price*modalQty);
+}
+
+function closeModal(){
+  $("modalBackdrop").classList.remove("open"); document.body.style.overflow="";
+  setTimeout(()=>{ $("modalImg").src=""; },300); modalProduct=null;
+}
+
+$("modalClose").addEventListener("click",closeModal);
+$("modalBackdrop").addEventListener("click",e=>{ if(e.target===$("modalBackdrop")) closeModal(); });
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){closeModal();closeDrawer();} });
+$("qtyMinus").addEventListener("click",()=>{ if(modalQty>1){modalQty--;$("qtyVal").textContent=modalQty;updateModalPrice();} });
+$("qtyPlus").addEventListener("click",()=>{ modalQty++;$("qtyVal").textContent=modalQty;updateModalPrice(); });
+$("btnAddModal").addEventListener("click",()=>{
+  if(!modalProduct) return;
+  const label=modalProduct.sizes?modalProduct.sizes[modalSelectedSi].label:null;
+  const price=modalProduct.sizes?modalProduct.sizes[modalSelectedSi].price:modalProduct.price;
+  addToCart(modalProduct,modalQty,label,price);
+  showToast(`${modalQty}× ${modalProduct.name}${label?" ("+label+")":""} masuk keranjang 🎉`);
+  closeModal();
+});
+
+/* ============================================================
+   KERANJANG — Gojek-style fullscreen 2 langkah
+   ============================================================ */
+let cart = [];
+let cartStep = 1;
+
+function addToCart(p, qty, sizeLabel, price){
+  const key = p.id + "|" + (sizeLabel || "");
+  const ex = cart.find(x => x.key === key);
+  if(ex) ex.qty += qty;
+  else cart.push({key, id:p.id, name:p.name, cat:p.cat, sizeLabel, price, qty, c:p.c, img:p.img});
+  updateCartBadge();
+}
+function removeFromCart(key){ cart = cart.filter(x => x.key !== key); renderCart(); }
+function changeCartQty(key, delta){
+  const item = cart.find(x => x.key === key); if(!item) return;
+  item.qty += delta;
+  if(item.qty <= 0) removeFromCart(key); else renderCart();
+}
+function clearCart(){ cart = []; updateCartBadge(); closeCart(); }
+function getCartTotal(){ return cart.reduce((s,x) => s + x.price * x.qty, 0); }
+function getCartCount(){ return cart.reduce((s,x) => s + x.qty, 0); }
+
+function updateCartBadge(){
+  const count = getCartCount(), total = getCartTotal();
+  const nc = $("cartNavCount"); nc.textContent = count; nc.classList.toggle("show", count > 0);
+  $("cartPanel").classList.toggle("show", count > 0);
+  $("cpSummary").textContent = count + " item · " + rp(total);
+  $("cpTotal").textContent = rp(total);
+}
+
+function renderCart(){
+  updateCartBadge();
+  if(cartStep === 1) renderStep1(); else renderStep2();
+}
+
+/* STEP 1: Review pesanan */
+function renderStep1(){
+  cartStep = 1;
+  $("cartTopbarTitle").textContent = "Keranjang";
+  $("stepDot1").classList.add("active"); $("stepDot2").classList.remove("active");
+  $("btnNextStep").textContent = "Lanjut ke Detail Pesanan →";
+  $("btnNextStep").className = "btn-cart-action btn-next";
+
+  if(!cart.length){
+    $("cartFooter").style.display = "none";
+    $("cartContent").innerHTML =
+      '<div class="cart-empty"><div class="ce-icon">🛒</div><p>Keranjang masih kosong.<br>Yuk pilih kue favoritmu!</p></div>';
+    return;
+  }
+
+  const total = getCartTotal(), count = getCartCount();
+  $("cartFooter").style.display = "";
+  $("cartTotalVal").textContent = rp(total);
+  $("cartItemsCount").textContent = count + " item";
+
+  const itemsHTML = cart.map(item => {
+    const bg = "linear-gradient(135deg," + item.c[0] + "," + item.c[1] + ")";
+    const imgTag = item.img
+      ? '<img src="' + item.img + '" alt="' + item.name + '" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover">'
+      : '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">' + cakeSVG() + '</div>';
+    const sz = item.sizeLabel ? '<div class="ci-sub">Ukuran: ' + item.sizeLabel + '</div>' : '';
+    return '<div class="cart-item" data-key="' + item.key + '">'
+      + '<div class="ci-thumb"><div class="p-bg" style="background:' + bg + '">' + imgTag + '</div></div>'
+      + '<div class="ci-info">'
+        + '<div class="ci-name">' + item.name + '</div>' + sz
+        + '<div class="ci-unit-price">' + rp(item.price) + ' / item</div>'
+        + '<div class="ci-row-bottom">'
+          + '<div class="ci-qty-row">'
+            + '<button class="ci-qty-btn" data-key="' + item.key + '" data-d="-1">−</button>'
+            + '<span class="ci-qty-val">' + item.qty + '</span>'
+            + '<button class="ci-qty-btn" data-key="' + item.key + '" data-d="1">+</button>'
+          + '</div>'
+          + '<span class="ci-line-total">' + rp(item.price * item.qty) + '</span>'
+        + '</div>'
+      + '</div>'
+      + '<button class="ci-remove" data-key="' + item.key + '" title="Hapus">🗑</button>'
+      + '</div>';
+  }).join("");
+
+  $("cartContent").innerHTML =
+    '<div class="cart-section">'
+    + '<div class="cart-section-title">Item yang dipesan (' + count + ')</div>'
+    + itemsHTML
+    + '</div>'
+    + '<div class="cart-summary-card">'
+      + '<div class="summary-row"><span>Subtotal (' + count + ' item)</span><span>' + rp(total) + '</span></div>'
+      + '<div class="summary-row total"><span>Total</span><span>' + rp(total) + '</span></div>'
+    + '</div>';
+
+  $("cartContent").querySelectorAll(".ci-qty-btn").forEach(b =>
+    b.addEventListener("click", () => changeCartQty(b.dataset.key, +b.dataset.d)));
+  $("cartContent").querySelectorAll(".ci-remove").forEach(b =>
+    b.addEventListener("click", () => removeFromCart(b.dataset.key)));
+}
+
+/* STEP 2: Detail pembeli */
+function renderStep2(){
+  cartStep = 2;
+  $("cartTopbarTitle").textContent = "Detail Pesanan";
+  $("stepDot1").classList.remove("active"); $("stepDot2").classList.add("active");
+
+  const total = getCartTotal(), count = getCartCount();
+  $("cartFooter").style.display = "";
+  $("cartTotalVal").textContent = rp(total);
+  $("cartItemsCount").textContent = count + " item";
+  $("btnNextStep").textContent = "💬 Kirim Pesanan via WhatsApp";
+  $("btnNextStep").className = "btn-cart-action btn-wa";
+
+  const summaryRows = cart.map(x => {
+    const sz = x.sizeLabel ? " (" + x.sizeLabel + ")" : "";
+    return '<div class="summary-row"><span>' + x.name + sz + ' ×' + x.qty + '</span><span>' + rp(x.price*x.qty) + '</span></div>';
+  }).join("");
+
+  $("cartContent").innerHTML =
+    '<div class="form-card" style="margin-top:1.25rem">'
+      + '<div class="form-card-title">Data Pemesan</div>'
+      + '<div class="form-group"><label>Nama Pemesan</label>'
+        + '<input type="text" id="orderName" placeholder="Masukkan nama lengkap kamu" autocomplete="name"></div>'
+      + '<div class="form-row">'
+        + '<div class="form-group"><label>Metode Pembayaran</label>'
+          + '<select id="orderPayment"><option value="Transfer Bank">Transfer Bank</option>'
+          + '<option value="QRIS">QRIS</option>'
+          + '<option value="COD / Bayar di Tempat">COD / Bayar di Tempat</option></select></div>'
+        + '<div class="form-group"><label>Pengambilan</label>'
+          + '<select id="orderPickup"><option value="Diambil Sendiri">Diambil Sendiri</option>'
+          + '<option value="Diantar">Diantar</option></select></div>'
+      + '</div>'
+      + '<div class="form-group"><label>Catatan (opsional)</label>'
+        + '<textarea id="orderNote" rows="3" placeholder="Contoh: tulisan di kue, request dekorasi, tanggal ambil"></textarea></div>'
+    + '</div>'
+    + '<div class="cart-summary-card" style="margin-top:0">'
+      + '<div class="cart-section-title" style="margin-bottom:.65rem">Ringkasan Pesanan</div>'
+      + summaryRows
+      + '<div class="summary-row total"><span>Total</span><span>' + rp(total) + '</span></div>'
+    + '</div>'
+    + '<div style="text-align:center;padding:.5rem 0 1.5rem">'
+      + '<button class="btn-back-step" id="btnBackToReview">← Kembali edit pesanan</button>'
+    + '</div>';
+
+  $("cartContent").querySelector("#btnBackToReview")
+    .addEventListener("click", () => { renderStep1(); $("cartContent").scrollTo(0,0); });
+}
+
+function openCart(){ $("cartOverlay").classList.add("open"); document.body.style.overflow="hidden"; renderStep1(); $("cartContent").scrollTo(0,0); }
+function closeCart(){ $("cartOverlay").classList.remove("open"); document.body.style.overflow=""; }
+
+$("cartBackBtn").addEventListener("click", () => {
+  if(cartStep === 2){ renderStep1(); $("cartContent").scrollTo(0,0); }
+  else closeCart();
+});
+
+$("btnNextStep").addEventListener("click", () => {
+  if(cartStep === 1){
+    if(!cart.length) return;
+    renderStep2(); $("cartContent").scrollTo(0,0);
+  } else {
+    const nameEl = $("orderName");
+    const name = nameEl?.value.trim() || "";
+    if(!name){
+      nameEl.style.borderColor = "var(--accent)";
+      nameEl.focus();
+      nameEl.placeholder = "⚠ Nama wajib diisi!";
+      return;
+    }
+    nameEl.style.borderColor = "";
+    const payment = $("orderPayment")?.value || "Transfer Bank";
+    const pickup  = $("orderPickup")?.value  || "Diambil Sendiri";
+    const note    = ($("orderNote")?.value.trim()) || "";
+    const lines   = cart.map(x => {
+      const sz = x.sizeLabel ? " (" + x.sizeLabel + ")" : "";
+      return "  - " + x.name + sz + " (x" + x.qty + ") = " + rp(x.price * x.qty);
+    }).join("\n");
+    const total = getCartTotal();
+    const noteStr = note ? "\nCatatan        : " + note : "";
+    const msg = "Halo Ockta Bakery, saya ingin melakukan pemesanan.\n\n"
+      + "Nama Pemesan   : " + name + "\n"
+      + "Pengambilan    : " + pickup + "\n"
+      + "Pembayaran     : " + payment + "\n\n"
+      + "Detail Pesanan :\n" + lines + noteStr + "\n\n"
+      + "Total Keseluruhan: " + rp(total) + "\n\n"
+      + "Mohon konfirmasi ketersediaan stok dan jadwal pengirimannya. Terima kasih.";
+    window.open(waLink(msg), "_blank", "noopener");
+  }
+});
+
+$("cartNavBtn").addEventListener("click", openCart);
+$("btnOpenDrawer").addEventListener("click", openCart);
+$("btnClearCart").addEventListener("click", clearCart);
+
+
+let toastTimer;
+function showToast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),2500); }
+
+document.getElementById("yr").textContent=new Date().getFullYear();
+</script>
+</body>
+</html>
